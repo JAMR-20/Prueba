@@ -65,6 +65,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto updateProduct(Long id, ProductEntity productEntity) {
+        try{
         ProductEntity product = productRepository.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("Producto no encontrado con id: " +id));
 
@@ -80,13 +81,15 @@ public class ProductServiceImpl implements ProductService {
 
         product.setFechaModificacion(LocalDateTime.now());
         product.setEstado(productEntity.getEstado());
-        product.setCliente(productEntity.getCliente());
         product.setSaldo(productEntity.getSaldo());
         product.setFechaCreacion(productEntity.getFechaCreacion());
 
         product = productRepository.save(product);
-        ProductDto productDto = ProductMapper.toProductDto(product);
-        return productDto;
+
+        return ProductMapper.toProductDto(product);
+    }catch (Exception e){
+            throw  new IllegalArgumentException("Error en la actualizacion: "+e.getMessage());
+    }
     }
 
     @Override

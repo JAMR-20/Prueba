@@ -87,8 +87,8 @@ public class ClientServiceImpl implements ClientService {
 
         existingCliente = clienRepository.save(existingCliente);
 
-        ClientDto clientDataDtoResponse = ClientMapper.toClientDto(existingCliente);
-        return clientDataDtoResponse;
+
+        return ClientMapper.toClientDto(existingCliente);
 
     }
 
