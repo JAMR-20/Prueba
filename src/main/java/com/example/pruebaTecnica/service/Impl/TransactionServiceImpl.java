@@ -3,6 +3,7 @@ package com.example.pruebaTecnica.service.Impl;
 import com.example.pruebaTecnica.dto.TransactionDtoResponse;
 import com.example.pruebaTecnica.dto.TransactionDtoResponseData;
 import com.example.pruebaTecnica.entity.ProductEntity;
+import com.example.pruebaTecnica.entity.TransactionEntity;
 import com.example.pruebaTecnica.exception.ClientNotFoundException;
 import com.example.pruebaTecnica.exception.ProductNotFoundException;
 import com.example.pruebaTecnica.repository.ProductRepository;
@@ -12,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Validated
@@ -22,45 +26,109 @@ public class TransactionServiceImpl implements TransactionService {
 
 
     @Override
-    public TransactionDtoResponse realizarConsignacion(String numeroCuenta, BigDecimal monto) throws ProductNotFoundException {
-        String code = null;
-        String message = null;
-        ProductEntity product = productRepository.findByNumeroCuenta(numeroCuenta)
-                .orElseThrow(()-> new ProductNotFoundException("El producto no fue encontrado: "));
-
-
-
-        if (monto.compareTo(BigDecimal.ZERO)<=0){
-            return null;
+    public TransactionDtoResponse realizarConsignacion(String cuentaOrigen, String cuentaDestino, BigDecimal monto) throws ProductNotFoundException {
+        if (monto.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El monto debe ser mayor a 0");
         }
 
-        product.setSaldo(product.getSaldo().add(monto));
-        productRepository.save(product);
+        ProductEntity CuentaOrigen = productRepository.findByNumeroCuenta(cuentaOrigen)
+                .orElseThrow(() -> new ProductNotFoundException("La cuenta origen no fue encontrado: " + cuentaOrigen));
+        ProductEntity CuentaDestino = productRepository.findByNumeroCuenta(cuentaDestino)
+                .orElseThrow(()-> new ProductNotFoundException("La cuenta destino no fue encontrada: " ));
 
-        TransactionDtoResponseData transactionDataDto = TransactionDtoResponseData
-                .builder()
-                .numeroCuenta(numeroCuenta)
-                .monto(monto)
-                .build();
+        CuentaOrigen.setSaldo(CuentaOrigen.getSaldo().subtract(monto));
+        CuentaDestino.setSaldo(CuentaDestino.getSaldo().add(monto));
 
-        return TransactionDtoResponse
-                .builder()
-                .message(message)
-                .data(transactionDataDto)
-                .build();
+        TransactionEntity transaction = new TransactionEntity();
+        transaction.setTipo("Consignación");
+        transaction.setMonto(monto);
+        transaction.setFechaTransaccion(LocalDate.now());
+        transaction.setCuentaOrigen(CuentaDestino);
+        transaction.setCuentaDestino(CuentaOrigen);
+        transactionRepository.save(transaction);
+
+        productRepository.save(CuentaOrigen);
+        productRepository.save(CuentaDestino);
+
+        return TransactionDtoResponse.builder()
+                .message("Transaccion realizada con exito")
+                .data(TransactionDtoResponseData.builder()
+                        .monto(monto)
+                        .numeroCuentaDestino(cuentaDestino)
+                        .numeroCuentaOrigen(cuentaOrigen)
+                        .build())
+                .code("200").build();
     }
 
-    @Override
-    public String realizarRetiro(String numeroCuenta, BigDecimal monto) throws ProductNotFoundException {
-        return "";
-    }
+
+
 
     @Override
     public TransactionDtoResponse realizarTransferencia(String cuentaOrigen, String cuentaDestino, BigDecimal monto) throws ProductNotFoundException, ClientNotFoundException {
-        return null;
+        ProductEntity CuentaOrigen = productRepository.findByNumeroCuenta(cuentaOrigen)
+                .orElseThrow(()-> new ProductNotFoundException("La cuenta origen no fue encontrada: "));
+
+        ProductEntity CuentaDestino = productRepository.findByNumeroCuenta(cuentaDestino)
+                .orElseThrow(()-> new ProductNotFoundException("La cuenta destino no fue encontrada: " ));
+
+        CuentaOrigen.setSaldo(CuentaOrigen.getSaldo().subtract(monto));
+        CuentaDestino.setSaldo(CuentaDestino.getSaldo().add(monto));
+
+        TransactionEntity transaction = new TransactionEntity();
+        transaction.setTipo("Transferencia");
+        transaction.setMonto(monto);
+        transaction.setFechaTransaccion(LocalDate.now());
+        transaction.setCuentaOrigen(CuentaDestino);
+        transaction.setCuentaDestino(CuentaOrigen);
+        transactionRepository.save(transaction);
+
+        productRepository.save(CuentaOrigen);
+        productRepository.save(CuentaDestino);
+
+        return TransactionDtoResponse.builder()
+                .message("Transaccion realizada con exito")
+                .data(TransactionDtoResponseData.builder()
+                        .monto(monto)
+                        .numeroCuentaDestino(cuentaDestino)
+                        .numeroCuentaOrigen(cuentaOrigen)
+                        .build())
+                .code("200").build();
     }
 
-}
+    @Override
+    public TransactionDtoResponse retiro(String cuentaOrigen, BigDecimal monto) throws ProductNotFoundException {
+            ProductEntity CuentaOrigen = productRepository.findByNumeroCuenta(cuentaOrigen)
+                    .orElseThrow(()-> new ProductNotFoundException("La cuenta origen no fue encontrada: "));
+
+            CuentaOrigen.setSaldo(CuentaOrigen.getSaldo().subtract(monto));
+        TransactionEntity transaction = new TransactionEntity();
+        transaction.setTipo("Retiro");
+        transaction.setMonto(monto);
+        transaction.setFechaTransaccion(LocalDate.now());
+        transaction.setCuentaOrigen(CuentaOrigen);
+        transactionRepository.save(transaction);
+
+            productRepository.save(CuentaOrigen);
+
+            return TransactionDtoResponse.builder()
+                    .message("Transaccion realizada con exito")
+                    .data(TransactionDtoResponseData.builder()
+                            .monto(monto)
+                            .numeroCuentaOrigen(cuentaOrigen)
+                            .build())
+                    .code("200").build();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 

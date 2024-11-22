@@ -17,10 +17,6 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping("/save")
-    public ProductDto saveProduct(@RequestBody ProductDto productDataDto) throws ClientNotFoundException {
-        return productService.save(productDataDto.getTipoCuenta(), productDataDto.getSaldo(), productDataDto.getExentaGMF(), productDataDto.getClienteId());
-    }
     @PutMapping("/update/{id}")
     public ProductDto updateProduct (@PathVariable Long id, @RequestBody ProductEntity productEntity){
         return productService.updateProduct(id, productEntity);

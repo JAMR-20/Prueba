@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductService {
-    ProductDto save(TipoCuenta tipocuenta, BigDecimal saldo, Boolean exentaGMF, Long clienteId) throws ClientNotFoundException;
+    ProductDto save(TipoCuenta tipocuenta, ProductEntity productEntity) throws ClientNotFoundException;
     ProductDto updateProduct(Long id, ProductEntity productEntity);
     List<ProductEntity> findAll();
 }

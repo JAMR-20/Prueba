@@ -30,9 +30,9 @@ public class ProductServiceImpl implements ProductService {
     private final ClientRepository clientRepository;
 
     @Override
-    public ProductDto save(TipoCuenta tipocuenta, BigDecimal saldo, Boolean exentaGMF, Long clienteId) throws ClientNotFoundException {
-        if (tipocuenta == TipoCuenta.AHORROS && saldo.compareTo(BigDecimal.ZERO)<=0){
-            throw new IllegalArgumentException("La cuenta de ahorros debe ser mayor a cero");
+    public ProductDto save(TipoCuenta tipocuenta, EstadoCuenta estadoCuenta, ProductEntity productEntity) throws ClientNotFoundException {
+        if (tipocuenta == TipoCuenta.AHORROS && productEntity.getSaldo().compareTo(BigDecimal.ZERO)<=0){
+            throw new IllegalArgumentException("La cuenta de ahorros debe tener un saldo mayor a cero");
         }
 
         String numeroCuenta = generarNumero(tipocuenta);
@@ -40,15 +40,15 @@ public class ProductServiceImpl implements ProductService {
         if (productRepository.existsByNumeroCuenta(numeroCuenta)){
             throw new IllegalArgumentException("El cliente ya existe");
         }
-        ClientEntity client = clientRepository.findById(clienteId)
-                .orElseThrow(()-> new ClientNotFoundException("El cliente ya existe con el id: " + clienteId));
+        ClientEntity client = clientRepository.findById(productEntity.getId())
+                .orElseThrow(()-> new ClientNotFoundException("El cliente ya existe con este id."));
 
         ProductEntity producto = new ProductEntity();
         producto.setTipoCuenta(tipocuenta);
         producto.setNumeroCuenta(numeroCuenta);
-        producto.setEstado(EstadoCuenta.ACTIVA);
+        producto.setEstado(estadoCuenta.ACTIVA);
         producto.setSaldo(producto.getSaldo());
-        producto.setExentaGMF(exentaGMF);
+        producto.setExentaGMF(producto.getExentaGMF());
         producto.setFechaCreacion(LocalDateTime.now());
         producto.setFechaModificacion(null);
         producto.setCliente(client);
