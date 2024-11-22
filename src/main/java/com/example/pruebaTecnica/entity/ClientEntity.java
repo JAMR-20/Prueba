@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 public class ClientEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long clienteId;
+    private Long id;
 
     private String tipoIdentificacion;
 

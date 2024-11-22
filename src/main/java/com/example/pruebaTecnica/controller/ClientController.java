@@ -23,22 +23,27 @@ public class ClientController {
     public List<ClientEntity> findAll(){
         return clientService.findAll();
     }
+
     @GetMapping("/findById/{id}")
     public ClientDtoResponse findById(@PathVariable Long id) throws ClientNotFoundException {
         return clientService.findById(id);
     }
+
     @PostMapping("/save")
     public Object save(@RequestBody @Validated ClientDto clientDataDto) {
         return clientService.save(clientDataDto);
     }
+
     @PutMapping("/update/{id}")
     public ClientDto update(@PathVariable Long id, @RequestBody ClientDto clientDataDto) throws ClientNotFoundException {
         return clientService.update(id, clientDataDto);
     }
+
     @GetMapping("/findByName/{nombre}")
     public ClientDtoResponse findClienteByName(@PathVariable String nombre) throws ClientNotFoundException {
         return clientService.findClienteByName(nombre);
     }
+
     @DeleteMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         return clientService.delete(id);

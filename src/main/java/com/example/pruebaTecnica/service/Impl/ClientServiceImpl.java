@@ -8,10 +8,8 @@ import com.example.pruebaTecnica.mapper.ClientMapper;
 import com.example.pruebaTecnica.repository.ClientRepository;
 import com.example.pruebaTecnica.service.ClientService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.CannotLoadBeanClassException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -22,7 +20,9 @@ import java.util.Optional;
 @Service
 @Validated
 public class ClientServiceImpl implements ClientService {
+
     private final ClientRepository clienRepository;
+
     private final ClientMapper clientMapper;
 
     @Override
@@ -37,6 +37,7 @@ public class ClientServiceImpl implements ClientService {
             if (!cliente.isPresent()){
                 throw new ClientNotFoundException("Client is not available");
             }
+
             return ClientMapper.clienteEntityToClienClienteDtoResponse("Client is available: ", cliente.get());
         }
 
@@ -75,9 +76,7 @@ public class ClientServiceImpl implements ClientService {
     public ClientDto update(Long id, ClientDto clienteDetails) throws ClientNotFoundException {
         ClientEntity existingCliente = clienRepository.findById(id)
                 .orElseThrow(() -> new ClientNotFoundException("Cliente no encontrado con id: "+id));
-        /**clienRepository.save(client);
-        ClientDto clientDataDtoResponse = ClientMapper.toClientDto(client);
-        return clientDataDtoResponse;**/
+
         existingCliente.setTipoIdentificacion(clienteDetails.getTipoIdentificacion());
         existingCliente.setNumeroIdentificacion(clienteDetails.getNumeroIdentificacion());
         existingCliente.setNombre(clienteDetails.getNombre());
@@ -86,10 +85,8 @@ public class ClientServiceImpl implements ClientService {
         existingCliente.setFechaNacimiento(clienteDetails.getFechaNacimiento());
         existingCliente.setFechaModificacion(LocalDateTime.now());
 
-        // Guarda los cambios en la base de datos
         existingCliente = clienRepository.save(existingCliente);
 
-        // Convierte la entidad actualizada en un DTO y retorna
         ClientDto clientDataDtoResponse = ClientMapper.toClientDto(existingCliente);
         return clientDataDtoResponse;
 
