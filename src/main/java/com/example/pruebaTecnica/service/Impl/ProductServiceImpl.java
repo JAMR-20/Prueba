@@ -28,39 +28,39 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ClientRepository clientRepository;
+    private final ProductMapper productMapper;
 
-    @Override
-    public ProductDto save(TipoCuenta tipocuenta, EstadoCuenta estadoCuenta, ProductEntity productEntity) throws ClientNotFoundException {
-        if (tipocuenta == TipoCuenta.AHORROS && productEntity.getSaldo().compareTo(BigDecimal.ZERO)<=0){
-            throw new IllegalArgumentException("La cuenta de ahorros debe tener un saldo mayor a cero");
-        }
-
-        String numeroCuenta = generarNumero(tipocuenta);
-
-        if (productRepository.existsByNumeroCuenta(numeroCuenta)){
-            throw new IllegalArgumentException("El cliente ya existe");
-        }
-        ClientEntity client = clientRepository.findById(productEntity.getId())
-                .orElseThrow(()-> new ClientNotFoundException("El cliente ya existe con este id."));
-
-        ProductEntity producto = new ProductEntity();
-        producto.setTipoCuenta(tipocuenta);
-        producto.setNumeroCuenta(numeroCuenta);
-        producto.setEstado(estadoCuenta.ACTIVA);
-        producto.setSaldo(producto.getSaldo());
-        producto.setExentaGMF(producto.getExentaGMF());
-        producto.setFechaCreacion(LocalDateTime.now());
-        producto.setFechaModificacion(null);
-        producto.setCliente(client);
-
-        productRepository.save(producto);
-        return ProductMapper.toProductDto(producto);
-
-    }
     private String generarNumero(TipoCuenta tipoCuenta){
         String prefijo = tipoCuenta == TipoCuenta.AHORROS ? "33" : "53";
         String numeroRestante = String.format("%08d", (int) (Math.random() * 100000000));
         return prefijo + numeroRestante;
+    }
+
+
+    @Override
+    public ProductDto save(TipoCuenta tipoCuenta, BigDecimal saldo, Boolean exentaGMF, Long clienteId) throws ClientNotFoundException {
+        if (tipoCuenta == TipoCuenta.AHORROS && saldo.compareTo(BigDecimal.ZERO)<=0){
+            throw new IllegalArgumentException("La cuenta de ahorros debe tener un saldo mayor a cero");
+        }
+        String numeroCuenta = generarNumero(tipoCuenta);
+
+        if (productRepository.existsByNumeroCuenta(numeroCuenta)){
+            throw new IllegalArgumentException("El cliente ya existe");
+        }
+        ClientEntity cliente = clientRepository.findById(clienteId)
+                .orElseThrow(() -> new ClientNotFoundException("No se puede vincular el cliente" + clienteId));
+
+        ProductEntity producto = ProductMapper.toEntity(tipoCuenta, saldo, exentaGMF, cliente);
+        producto.setTipoCuenta(tipoCuenta);
+        producto.setNumeroCuenta(numeroCuenta);
+        producto.setEstado(EstadoCuenta.ACTIVA);
+        producto.setSaldo(saldo);
+        producto.setExentaGMF(exentaGMF);
+        producto.setFechaCreacion(LocalDateTime.now());
+        producto.setFechaModificacion(null);
+        producto.setCliente(cliente);
+
+        return ProductMapper.toProductDto(productRepository.save(producto));
     }
 
     @Override

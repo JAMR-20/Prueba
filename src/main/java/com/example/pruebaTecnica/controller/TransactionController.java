@@ -3,18 +3,14 @@ package com.example.pruebaTecnica.controller;
 import com.example.pruebaTecnica.dto.TransactionDto;
 import com.example.pruebaTecnica.dto.TransactionDtoResponse;
 import com.example.pruebaTecnica.dto.TransactionDtoResponseData;
-import com.example.pruebaTecnica.entity.TransactionEntity;
 import com.example.pruebaTecnica.exception.ClientNotFoundException;
 import com.example.pruebaTecnica.exception.ProductNotFoundException;
 import com.example.pruebaTecnica.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor

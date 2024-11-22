@@ -1,8 +1,6 @@
 package com.example.pruebaTecnica.entity;
-
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -16,7 +14,7 @@ public class TransactionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String tipo; // "Consignación", "Retiro", "Transferencia"
+    private String tipo;
 
     private BigDecimal monto;
 

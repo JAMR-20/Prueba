@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
+
 public class TransactionDtoResponse {
     private String code;
     private String message;

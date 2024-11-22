@@ -6,6 +6,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 @Getter
 @Builder
+
 public class TransactionDto {
     private String numeroCuenta;
     private BigDecimal monto;

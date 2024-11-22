@@ -1,11 +1,11 @@
 package com.example.pruebaTecnica.mapper;
 
 import com.example.pruebaTecnica.dto.ProductDto;
-import com.example.pruebaTecnica.dto.ProductRequestDto;
 import com.example.pruebaTecnica.entity.ClientEntity;
 import com.example.pruebaTecnica.entity.ProductEntity;
-import jakarta.persistence.Column;
+import com.example.pruebaTecnica.enums.TipoCuenta;
 import org.springframework.stereotype.Component;
+import java.math.BigDecimal;
 
 
 @Component
@@ -19,5 +19,15 @@ public static ProductDto toProductDto (ProductEntity productEntity){
             .build();
 
 }
+    public static ProductEntity toEntity(TipoCuenta tipoCuenta, BigDecimal saldo, Boolean exentaGMF, ClientEntity cliente) {
+        ProductEntity entity = new ProductEntity();
+        entity.setTipoCuenta(tipoCuenta);
+        entity.setSaldo(saldo);
+        entity.setExentaGMF(exentaGMF);
+        entity.setCliente(cliente);
+        return entity;
+    }
+
+
 }
 
